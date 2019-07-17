@@ -1,15 +1,21 @@
 <?php
 
 namespace App;
-
+use App\Mail\ProjectCreated;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    protected $fillable = [
-      'owner_id','title','description'
-    ];
+    protected $guarded = [];
+    // protected $fillable = [
+    //   'owner_id','title','description'
+    // ];
 
+    public function owner()
+    {
+      return $this->belongsTo(User::class);
+    }
     public function tasks()
     {
       return $this->hasMany(Task::class);

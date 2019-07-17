@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+//use Illuminate\Http\Request;
 use App\Project;
-use App\Mail\ProjectCreated;
+use App\Events\ProjectCreated;
+//use App\Mail\ProjectCreated;
+
+
 class ProjectsController extends Controller
 {
   public function __construct()
@@ -25,12 +28,12 @@ class ProjectsController extends Controller
   public function store()
   {
     $attribute = $this->validateProject();
-    $attribute['owner_id'] = auth()->id();
-    Project::create($attribute);
 
-    // \Mail::to('hassanshahzadaheer@gmail.com')->send(
-    //   new ProjectCreated($project)
-    // );
+    $attribute['owner_id'] = auth()->id();
+
+    $project = Project::create($attribute);
+
+    event(new ProjectCreated($project));
 
     return redirect('/projects');
   }
@@ -38,9 +41,7 @@ class ProjectsController extends Controller
   public function show(Project $project)
   {
     $this->authorize('update',$project);
-    // if($project->owner_id !== auth()->id()){
-    //   abort(403);
-    // }
+
     return view('projects.show',['projects' => $project]);
   }
 
@@ -52,7 +53,7 @@ class ProjectsController extends Controller
 
   public function update(Project $project)
   {
-    
+
     $project->update($this->validateProject());
     return  redirect('/projects');
   }
